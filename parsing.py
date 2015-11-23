@@ -178,12 +178,24 @@ def parse(tokens,grammar):
     accepting_state = (start_rule[0], start_rule[1], [], 0)
     return accepting_state in chart[len(tokens)-1]
 
+# grammar = [
+#     ("S", ["P" ]) ,
+#     ("P", ["P", "P"]),
+#     ("P", ["(" , "P", ")" ]),
+#     ("P", [ ]) ,
+# ]
+# tokens = [ "(", "(", ")", ")", "(", ")"]
+# result=parse(tokens, grammar)
+# print result
+
 grammar = [
-    ("S", ["P" ]) ,
-    ("P", ["P", "P"]),
-    ("P", ["(" , "P", ")" ]),
-    ("P", [ ]) ,
-]
-tokens = [ "(", "(", ")", ")", "(", ")"]
-result=parse(tokens, grammar)
+    ("S", ["id", "(", "OPTARGS", ")"]),
+    ("OPTARGS", []),
+    ("OPTARGS", ["ARGS"]),
+    ("ARGS", ["exp", ",", "ARGS"]),
+    ("ARGS", ["exp"]),
+    ]
+
+tokens = [ "id", "(", "exp", ",", "exp", ")" ]
+result = parse(tokens, grammar)
 print result
