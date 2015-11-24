@@ -188,14 +188,22 @@ def parse(tokens,grammar):
 # result=parse(tokens, grammar)
 # print result
 
-grammar = [
-    ("S", ["id", "(", "OPTARGS", ")"]),
-    ("OPTARGS", []),
-    ("OPTARGS", ["ARGS"]),
-    ("ARGS", ["exp", ",", "ARGS"]),
-    ("ARGS", ["exp"]),
-    ]
+# grammar = [
+#     ("S", ["id", "(", "OPTARGS", ")"]),
+#     ("OPTARGS", []),
+#     ("OPTARGS", ["ARGS"]),
+#     ("ARGS", ["exp", ",", "ARGS"]),
+#     ("ARGS", ["exp"]),
+#     ]
 
-tokens = [ "id", "(", "exp", ",", "exp", ")" ]
-result = parse(tokens, grammar)
-print result
+grammar = [
+    ("S", ["E"]),
+    ("E", ["E", "+", "E"]),
+    ("E", ["E", "-", "E"]),
+    ("E", ["num"]),
+    ("E", ["string"]),
+    ("t", ["hi"])
+    ]
+tokens = ["num", "+", "num"]    
+
+print parse(tokens, grammar)
