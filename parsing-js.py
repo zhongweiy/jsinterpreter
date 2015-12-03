@@ -140,6 +140,10 @@ def p_stmt_ifelse(p):
     'stmt : IF exp compoundstmt ELSE compoundstmt'
     p[0] = ("if-then-else", p[2], p[3], p[5])
 
+def p_stmt_while(p):
+    'stmt : WHILE exp compoundstmt'
+    p[0] = ("while", p[2], p[3])
+
 def p_stmt_assign(p):
     'stmt : IDENTIFIER EQUAL exp'
     p[0] = ("assign", p[1], p[3])

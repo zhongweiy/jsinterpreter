@@ -11,9 +11,6 @@
 
 # The closure function should return all the new parsing states that we want to
 # add to chart position i
-
-# Hint: This is tricky. If you are stuck, do a list comphrension over the grammar rules.
-
 def closure (grammar, i, x, ab, cd):
     return [ (g[0], [], g[1], i) for g in grammar
              if cd != [] and g[0] == cd[0]]
@@ -54,11 +51,7 @@ def shift (tokens, i, x, ab, cd, j):
 # Writing Reductions
 
 # We are looking at chart[i] and we see x => ab . cd from j.
-
-# Hint: Reductions are tricky, so as a hint, remember that you only want to do
-# reductions if cd == []
-
-# Hint: You'll have to look back previously in the chart.
+# only do reductions if cd == []
 
 def reductions(chart, i, x, ab, cd, j):
     return [ (s[0], s[1] + [s[2][0]], s[2][1:], s[3]) for s in chart[j]
@@ -142,7 +135,6 @@ def parse(tokens,grammar):
                 break
 
 ## Uncomment this block if you'd like to see the chart printed.
-#
     for i in range(len(tokens)):
         print "== chart " + str(i)
         for state in chart[i]:
@@ -196,14 +188,21 @@ def parse(tokens,grammar):
 #     ("ARGS", ["exp"]),
 #     ]
 
-grammar = [
-    ("S", ["E"]),
-    ("E", ["E", "+", "E"]),
-    ("E", ["E", "-", "E"]),
-    ("E", ["num"]),
-    ("E", ["string"]),
-    ("t", ["hi"])
-    ]
-tokens = ["num", "+", "num"]    
+# grammar = [
+#     ("S", ["E"]),
+#     ("E", ["E", "+", "E"]),
+#     ("E", ["E", "-", "E"]),
+#     ("E", ["num"]),
+#     ("E", ["string"]),
+#     ("t", ["hi"])
+#     ]
+# tokens = ["num", "+", "num"]
 
+grammar = [
+    ("S", ["P"]),
+    ("P", ["x"]),
+    ("P", ["P", "P"]),
+    ("P", [""]),
+    ]
+tokens = ["x", "x"]
 print parse(tokens, grammar)

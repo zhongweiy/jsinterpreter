@@ -35,6 +35,20 @@ def eval_stmt(tree,environment):
         raise Exception(retval)
     elif stmttype == "exp":
         eval_exp(tree[1],environment)
+    elif stmttype == "while":
+        # TODO assign tree to a named valuable.
+        eval_while(tree, environment)
+
+def eval_while(while_stmt, env):
+    # Fill in your own code here. Can be done in as few as 4 lines.
+    exp = while_stmt[1]
+    stmts = while_stmt[2]
+    # we could also use recursive one to interpreter while
+    # if eval_exp(exp, env):
+    #     eval_stmts(stmts, env)
+    #     eval_while(while_stmt, env)
+    while eval_exp(exp, env):
+        eval_stmts(stmts, env)
         
 def env_lookup(vname,env):
     if vname in env[1]:

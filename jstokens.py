@@ -65,6 +65,7 @@ tokens = (
     'TIMES',        # *
     'TRUE',         # true
     'VAR',          # var
+    'WHILE',        # while
 )
 
 t_ignore = ' \t\v\r' # whitespace
@@ -135,6 +136,10 @@ def t_NUMBER(t):
 def t_STRING(t):
     r'"((\\.)|[^"])*"'
     t.value = t.value[1:-1]
+    return t
+
+def t_WHILE(t):
+    r'while'
     return t
 
 def t_comment(t):
