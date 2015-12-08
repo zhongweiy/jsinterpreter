@@ -1,12 +1,16 @@
-# QUIZ : Frames
+#Global data structure definition
+#  - environment:
+#    global-environment: (None, {key-values})
+#    environment: (global-environment, {key-values})
+#    environment: (environment, {key-values})
+
 # Return will throw an excception
 # Function Calls: new environments, catch return values
-
 def eval_stmt(tree,environment):
     stmttype = tree[0]
-    if stmttype == "call": # ("call", "sqrt", [("number","2")])
-        fname = tree[1] # "sqrt"
-        args = tree[2] # [ ("number", "2") ]
+    if stmttype == "call":
+        fname = tree[1]
+        args = tree[2]
         fvalue = env_lookup(fname, environment)
         if fvalue[0] == "function":
             # We'll make a promise to ourselves:
@@ -38,9 +42,18 @@ def eval_stmt(tree,environment):
     elif stmttype == "while":
         # TODO assign tree to a named valuable.
         eval_while(tree, environment)
+    elif stmttype == "var":
+        eval_var(tree, environment)
+
+def eval_var(var_stmt, env):
+    exp = var_stmt[2]
+    value = eval_exp(exp, env)
+    vname = var_stmt[1]
+    # var statement doesn't raise error when variable is defined,
+    # it just overwrite it.
+    (env[1])[vname] = value
 
 def eval_while(while_stmt, env):
-    # Fill in your own code here. Can be done in as few as 4 lines.
     exp = while_stmt[1]
     stmts = while_stmt[2]
     # we could also use recursive one to interpreter while
@@ -49,7 +62,7 @@ def eval_while(while_stmt, env):
     #     eval_while(while_stmt, env)
     while eval_exp(exp, env):
         eval_stmts(stmts, env)
-        
+
 def env_lookup(vname,env):
     if vname in env[1]:
         return (env[1])[vname]
@@ -57,13 +70,13 @@ def env_lookup(vname,env):
         return None
     else:
         return env_lookup(vname,env[0])
-    
+
 def env_update(vname,value,env):
     if vname in env[1]:
         (env[1])[vname] = value
     elif not (env[0] == None):
         env_update(vname,value,env[0])
-        
+
 def eval_exp(exp,env):
     etype = exp[0]
     if etype == "number":
@@ -72,6 +85,7 @@ def eval_exp(exp,env):
         a = eval_exp(exp[1],env)
         op = exp[2]
         b = eval_exp(exp[3],env)
+        # TODO support +, -, / etc
         if op == "*":
             return a*b
     elif etype == "identifier":
@@ -81,13 +95,30 @@ def eval_exp(exp,env):
             print "ERROR: unbound variable " + vname
         else:
             return value
-            
+
 def eval_stmts(stmts,env):
     for stmt in stmts:
         eval_stmt(stmt,env)
-        
-sqrt = ("function",("x"),(("return",("binop",("identifier","x"),"*",("identifier","x"))),),{})
-                                
-environment = (None,{"sqrt":sqrt})
-                                
-print eval_stmt(("call","sqrt",[("number","2")]),environment)    
+
+def test_sqrt():
+    sqrt = ("function",("x"),(("return",("binop",("identifier","x"),"*",("identifier","x"))),),{})
+    environment = (None,{"sqrt":sqrt})
+
+    print eval_stmt(("call","sqrt",[("number","2")]),environment)
+
+def test_closure():
+    #add = ("function", (), ((
+    pass
+
+def test_var():
+    var_func = ("function",
+                (),
+                (("var", "foo", ("number", 2.0)),
+                 ("var", "bar", ("identifier", "foo")),
+                 ("return", ("identifier", "bar")),),
+                {})
+    environment = (None, {"var_func":var_func})
+    print eval_stmt(("call", "var_func", []), environment)
+
+if __name__ == '__main__':
+    test_var()
