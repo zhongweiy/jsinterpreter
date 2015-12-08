@@ -1,8 +1,12 @@
-#Global data structure definition
-#  - environment:
-#    global-environment: (None, {key-values})
-#    environment: (global-environment, {key-values})
-#    environment: (environment, {key-values})
+'''
+Global data structure definition
+ - environment:
+   global-environment: (None, {key-values})
+   environment: (global-environment, {key-values})
+   environment: (environment, {key-values})
+'''
+
+import unittest
 
 # Return will throw an excception
 # Function Calls: new environments, catch return values
@@ -35,6 +39,7 @@ def eval_stmt(tree,environment):
         else:
             print  "ERROR: call to non-function"
     elif stmttype == "return":
+        # BUG how can we distinguish integer retval and string retval?
         retval = eval_exp(tree[1],environment)
         raise Exception(retval)
     elif stmttype == "exp":
@@ -100,25 +105,45 @@ def eval_stmts(stmts,env):
     for stmt in stmts:
         eval_stmt(stmt,env)
 
-def test_sqrt():
-    sqrt = ("function",("x"),(("return",("binop",("identifier","x"),"*",("identifier","x"))),),{})
-    environment = (None,{"sqrt":sqrt})
+class TestFunc(unittest.TestCase):
+    def test_func(self):
+        sqrt = ("function",("x"),(("return",("binop",("identifier","x"),"*",("identifier","x"))),),{})
+        environment = (None,{"sqrt":sqrt})
 
-    print eval_stmt(("call","sqrt",[("number","2")]),environment)
+        try:
+            eval_stmt(("call","sqrt",[("number","2")]),environment)
+        except Exception as return_value:
+            self.assertEqual(str(return_value), "4")
 
-def test_closure():
-    #add = ("function", (), ((
-    pass
+    def test_closure(self):
+        #add = ("function", (), ((
+        pass
 
-def test_var():
-    var_func = ("function",
-                (),
-                (("var", "foo", ("number", 2.0)),
-                 ("var", "bar", ("identifier", "foo")),
-                 ("return", ("identifier", "bar")),),
-                {})
-    environment = (None, {"var_func":var_func})
-    print eval_stmt(("call", "var_func", []), environment)
+class TestVar(unittest.TestCase):
+    def test_var(self):
+        var_func = ("function",
+                    (),
+                    (("var", "foo", ("number", 1)),
+                     ("return", ("identifier", "bar")),),
+                    {})
+        environment = (None, {"var_func":var_func})
+        try:
+            eval_stmt(("call", "var_func", []), environment)
+        except Exception as return_value:
+            self.assertEqual(str(return_value), "1")
+
+    def test_refvar(self):
+        var_func = ("function",
+                    (),
+                    (("var", "foo", ("number", 2)),
+                     ("var", "bar", ("identifier", "foo")),
+                     ("return", ("identifier", "bar")),),
+                    {})
+        environment = (None, {"var_func":var_func})
+        try:
+            eval_stmt(("call", "var_func", []), environment)
+        except Exception as return_value:
+            self.assertEqual(str(return_value), "2")
 
 if __name__ == '__main__':
-    test_var()
+    unittest.main()
