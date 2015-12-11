@@ -221,9 +221,6 @@ def p_stmt_exp(p):
 #
 #       exp -> function ( optparams ) compoundstmt
 #
-# However, for this assignment you are not responsible for lambda
-# expressions.
-#
 # Arguments are comma-separated expressions. The parse tree for args or
 # optargs is just the list of the parse trees of the component expressions.
 
@@ -292,6 +289,8 @@ def p_exp_call(p):
     'exp : IDENTIFIER LPAREN optargs RPAREN'
     p[0] = ("call", p[1], p[3])
 
+# TODO add anonymous functions call exp
+
 def p_exp_optargs_last(p):
     'optargs : '
     p[0] = []
@@ -310,7 +309,7 @@ def p_exp_args_last(p):
 
 if __name__ == '__main__':
     jslexer = lex.lex(module=jstokens)
-    jsparser = yacc.yacc()
+    jsparser = yacc.yacc(debug=True)
 
     # test
     def test_parser(input_string):
@@ -387,3 +386,29 @@ if __name__ == '__main__':
     """
     jstree4_stm = [('stmt', ('if-then', ('identifier', 'cherry'), [('exp', ('identifier', 'orchard')), ('if-then-else', ('identifier', 'uncle_vanya'), [('exp', ('identifier', 'anton')), ('exp', ('identifier', 'chekov'))], []), ('exp', ('identifier', 'nineteen_oh_four'))]))]
     print test_parser(jstext4_stm) == jstree4_stm
+
+    # BUG
+    jstext5_stm = """
+    function add_func() {
+      function count_func() {
+      };
+    }
+
+    add_func();
+    """
+    print test_parser(jstext5_stm)
+
+    jstext6_stm = """
+    function add_func() {
+      var counter = 0;
+      var add = function() {
+        counter = counter + 1;
+        return counter;
+      };
+      return add;
+    }
+    
+    var add = add_func();
+    add();
+    """
+    print test_parser(jstext6_stm)
