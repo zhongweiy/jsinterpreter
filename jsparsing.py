@@ -401,11 +401,10 @@ if __name__ == '__main__':
     jstext6_stm = """
     function add_func() {
       var counter = 0;
-      var add = function() {
+      return function() {
         counter = counter + 1;
         return counter;
       };
-      return add;
     }
     
     var add = add_func();

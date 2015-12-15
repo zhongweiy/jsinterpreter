@@ -159,12 +159,20 @@ class TestFunc(unittest.TestCase):
         except Exception as return_value:
             self.assertEqual(str(return_value), "4.0")
 
-    def test_closure(self):
+    def test_closure1(self):
         tree = [('function', 'add_func', [], [('var', 'counter', ('number', 0.0)), ('var', 'add', ('function', [], [('assign', 'counter', ('binop', ('identifier', 'counter'), '+', ('number', 1.0))), ('return', ('identifier', 'counter'))])), ('return', ('identifier', 'add'))]), ('stmt', ('var', 'add', ('call', 'add_func', []))), ('stmt', ('exp', ('call', 'add', []))), ('stmt', ('return', ('call', 'add', [])))]
         try:
             interpret(tree)
         except Exception as ret:
             self.assertEqual(str(ret), "2.0")
+
+    def test_closure2(self):
+        tree = [('function', 'add_func', [], [('var', 'counter', ('number', 0.0)), ('return', ('function', [], [('assign', 'counter', ('binop', ('identifier', 'counter'), '+', ('number', 1.0))), ('return', ('identifier', 'counter'))]))]), ('stmt', ('var', 'add', ('call', 'add_func', []))), ('stmt', ('exp', ('call', 'add', []))), ('stmt', ('return', ('call', 'add', [])))]
+        try:
+            interpret(tree)
+        except Exception as ret:
+            self.assertEqual(str(ret), "2.0")
+
 
 class TestVar(unittest.TestCase):
     def test_var(self):
