@@ -410,6 +410,6 @@ if __name__ == '__main__':
     
     var add = add_func();
     add();
-    write(add());
+    return add();
     """
     print test_parser(jstext6_stm)

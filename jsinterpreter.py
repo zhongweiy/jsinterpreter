@@ -8,34 +8,41 @@ Global data structure definition
 
 import unittest,copy
 
-# Return will throw an excception
-# Function Calls: new environments, catch return values
-def eval_stmt(tree,environment):
-    stmttype = tree[0]
-    if stmttype == "function":
+def eval_elt(tree, env):
+    if tree[0] == "function":
+        # function definition.
         # ("function", identifier, optparams, compoundstmt)
         fname = tree[1]
         fparams = tree[2]
         fbody = tree[3]
         # TODO Is it correct to define function's enclosing environment?
-        fenv = environment
+        fenv = env
         value = ("function", fparams, fbody, fenv)
-        env_add(fname, value, environment)
-    elif stmttype == "return":
-        retval = eval_exp(tree[1],environment)
+        env_add(fname, value, env)
+    elif tree[0] == "stmt":
+        eval_stmt(tree[1], env)
+    else:
+        print "ERROR: {} is not a supported element.".format(tree[0])
+
+# Return will throw an excception
+# Function Calls: new environments, catch return values
+def eval_stmt(tree, env):
+    stmttype = tree[0]
+    if stmttype == "return":
+        retval = eval_exp(tree[1],env)
         raise Exception(retval)
     elif stmttype == "exp":
-        eval_exp(tree[1],environment)
+        eval_exp(tree[1],env)
     elif stmttype == "while":
         # TODO assign tree to a named valuable.
-        eval_while(tree, environment)
+        eval_while(tree, env)
     elif stmttype == "var":
-        eval_var(tree, environment)
+        eval_var(tree, env)
     elif stmttype == "assign":
         fname = tree[1]
         exp = tree[2]
-        fvalue = eval_exp(exp, environment)
-        env_update(fname, fvalue, environment)
+        fvalue = eval_exp(exp, env)
+        env_update(fname, fvalue, env)
     else:
         print "ERROR: {} statement type is not supported.".format(stmttype)
 
@@ -110,22 +117,23 @@ def eval_exp(exp,env):
             if len(fparams) != len(args):
                 print "ERROR: function argument and formal params does not match."
             else:
-                #Make a new environment frame
+                # Make a new environment frame.
                 new_cur_env = {}
                 for i in range(len(fparams)):
                     new_cur_env[fparams[i]] = eval_exp(args[i], env)
-                    # new environment's parent is fenv. This is lexical binding.
+                # New environment's parent is fenv. This is lexical binding.
                 new_env = (fenv, new_cur_env)
                 try:
                     eval_stmts(fbody, new_env)
                 except Exception as return_value:
-                    print return_value.args[0]
+                    #TODO add debug function
+                    #print return_value.args[0]
                     return return_value.args[0]
         else:
             print "ERROR: call to non-function"
             print "ERROR-details: exp: {}, env: {}".format(exp, env)
     elif etype == "function":
-        # anonymous function
+        # Handle anonymous function.
         args = exp[1]
         fbody = exp[2]
         fenv = env
@@ -135,8 +143,12 @@ def eval_exp(exp,env):
 
 def eval_stmts(stmts,env):
     for stmt in stmts:
-        # TODO how can we return "the return value"?
         eval_stmt(stmt,env)
+
+def interpret(ast):
+    global_env = (None, {})
+    for elt in ast:
+        eval_elt(elt, global_env)
 
 class TestFunc(unittest.TestCase):
     # def test_func(self):
@@ -149,10 +161,11 @@ class TestFunc(unittest.TestCase):
     #         self.assertEqual(str(return_value), "4.0")
 
     def test_closure(self):
-        tree = [('function', 'add_func', [], [('var', 'counter', ('number', 0.0)), ('var', 'add', ('function', [], [('assign', 'counter', ('binop', ('identifier', 'counter'), '+', ('number', 1.0))), ('return', ('identifier', 'counter'))])), ('return', ('identifier', 'add'))]), ('var', 'add', ('call', 'add_func', [])), ('exp', ('call', 'add', [])), ('exp', ('call', 'add', [])),]
-        environment = (None, {})
-        print eval_stmts(tree, environment)
-        #self.assertEqual(str(return_value), "2.0")
+        tree = [('function', 'add_func', [], [('var', 'counter', ('number', 0.0)), ('var', 'add', ('function', [], [('assign', 'counter', ('binop', ('identifier', 'counter'), '+', ('number', 1.0))), ('return', ('identifier', 'counter'))])), ('return', ('identifier', 'add'))]), ('stmt', ('var', 'add', ('call', 'add_func', []))), ('stmt', ('exp', ('call', 'add', []))), ('stmt', ('return', ('call', 'add', [])))]
+        try:
+            interpret(tree)
+        except Exception as ret:
+            self.assertEqual(str(ret), "2.0")
 
 # class TestVar(unittest.TestCase):
 #     def test_var(self):
