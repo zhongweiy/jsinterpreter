@@ -15,7 +15,6 @@ def eval_elt(tree, env):
         fname = tree[1]
         fparams = tree[2]
         fbody = tree[3]
-        # TODO Is it correct to define function's enclosing environment?
         fenv = env
         value = ("function", fparams, fbody, fenv)
         env_add(fname, value, env)
@@ -126,7 +125,7 @@ def eval_exp(exp,env):
                 try:
                     eval_stmts(fbody, new_env)
                 except Exception as return_value:
-                    #TODO add debug function
+                    #TODO Add debug function and log level.
                     #print return_value.args[0]
                     return return_value.args[0]
         else:
@@ -151,14 +150,14 @@ def interpret(ast):
         eval_elt(elt, global_env)
 
 class TestFunc(unittest.TestCase):
-    # def test_func(self):
-    #     sqrt = ("function",("x"),(("return",("binop",("identifier","x"),"*",("identifier","x"))),),{})
-    #     environment = (None,{"sqrt":sqrt})
+    def test_func(self):
+        sqrt = ("function",("x"),(("return",("binop",("identifier","x"),"*",("identifier","x"))),),{})
+        environment = (None,{"sqrt":sqrt})
 
-    #     try:
-    #         eval_exp(("call","sqrt",[("number","2")]),environment)
-    #     except Exception as return_value:
-    #         self.assertEqual(str(return_value), "4.0")
+        try:
+            eval_exp(("call","sqrt",[("number","2")]),environment)
+        except Exception as return_value:
+            self.assertEqual(str(return_value), "4.0")
 
     def test_closure(self):
         tree = [('function', 'add_func', [], [('var', 'counter', ('number', 0.0)), ('var', 'add', ('function', [], [('assign', 'counter', ('binop', ('identifier', 'counter'), '+', ('number', 1.0))), ('return', ('identifier', 'counter'))])), ('return', ('identifier', 'add'))]), ('stmt', ('var', 'add', ('call', 'add_func', []))), ('stmt', ('exp', ('call', 'add', []))), ('stmt', ('return', ('call', 'add', [])))]
@@ -167,31 +166,31 @@ class TestFunc(unittest.TestCase):
         except Exception as ret:
             self.assertEqual(str(ret), "2.0")
 
-# class TestVar(unittest.TestCase):
-#     def test_var(self):
-#         var_func = ("function",
-#                     (),
-#                     (("var", "foo", ("number", 2)),
-#                      ("return", ("identifier", "foo")),),
-#                     {})
-#         environment = (None, {"var_func":var_func})
-#         try:
-#             eval_exp(("call", "var_func", []), environment)
-#         except Exception as return_value:
-#             self.assertEqual(str(return_value), "2.0")
+class TestVar(unittest.TestCase):
+    def test_var(self):
+        var_func = ("function",
+                    (),
+                    (("var", "foo", ("number", 2)),
+                     ("return", ("identifier", "foo")),),
+                    {})
+        environment = (None, {"var_func":var_func})
+        try:
+            eval_exp(("call", "var_func", []), environment)
+        except Exception as return_value:
+            self.assertEqual(str(return_value), "2.0")
 
-#     def test_refvar(self):
-#         var_func = ("function",
-#                     (),
-#                     (("var", "foo", ("number", 2)),
-#                       ("var", "bar", ("identifier", "foo")),
-#                      ("return", ("identifier", "bar")),),
-#                     {})
-#         environment = (None, {"var_func":var_func})
-#         try:
-#             eval_exp(("call", "var_func", []), environment)
-#         except Exception as return_value:
-#             self.assertEqual(str(return_value), "2.0")
+    def test_refvar(self):
+        var_func = ("function",
+                    (),
+                    (("var", "foo", ("number", 2)),
+                      ("var", "bar", ("identifier", "foo")),
+                     ("return", ("identifier", "bar")),),
+                    {})
+        environment = (None, {"var_func":var_func})
+        try:
+            eval_exp(("call", "var_func", []), environment)
+        except Exception as return_value:
+            self.assertEqual(str(return_value), "2.0")
 
 if __name__ == '__main__':
     unittest.main()
