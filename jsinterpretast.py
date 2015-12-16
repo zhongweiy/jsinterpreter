@@ -42,6 +42,19 @@ def eval_stmt(tree, env):
         exp = tree[2]
         fvalue = eval_exp(exp, env)
         env_update(fname, fvalue, env)
+    elif stmttype == "if-then-else":
+        exp = tree[1]
+        then_stmts = tree[2]
+        else_stmts = tree[3]
+        if eval_exp(exp, env):
+            eval_stmts(then_stmts, env)
+        else:
+            eval_stmts(else_stmts, env)
+    elif stmttype == "if-then":
+        exp = tree[1]
+        then_stmts = tree[2]
+        if eval_exp(exp, env):
+            eval_stmts(then_stmts, env)
     else:
         print "ERROR: {} statement type is not supported.".format(stmttype)
 
@@ -96,6 +109,8 @@ def eval_exp(exp,env):
             return a-b
         elif op == "/":
             return a/b
+        elif op == "<=":
+            return a <= b
         else:
             print "ERROR: \"{}\" binop has not supportted yet.".format(op)
     elif etype == "identifier":
