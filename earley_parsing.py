@@ -198,11 +198,12 @@ def parse(tokens,grammar):
 #     ]
 # tokens = ["num", "+", "num"]
 
-grammar = [
-    ("S", ["P"]),
-    ("P", ["x"]),
-    ("P", ["P", "P"]),
-    ("P", [""]),
+if __name__ == "__main__":
+    grammar = [
+        ("S", ["P"]),
+        ("P", ["x"]),
+        ("P", ["P", "P"]),
+        ("P", [""]),
     ]
-tokens = ["x", "x"]
-print parse(tokens, grammar)
+    tokens = ["x", "x"]
+    print parse(tokens, grammar)
